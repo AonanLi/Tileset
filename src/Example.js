@@ -1,10 +1,11 @@
 import React from 'react';
 import Selection from 'react-ds';
 
+const rows = [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']];
+
 export default class Example extends React.PureComponent {
     constructor() {
         super();
-
         this.state = {
             ref: null,
             elRefs: [],
@@ -12,30 +13,21 @@ export default class Example extends React.PureComponent {
         };
     }
 
-    handleSelection = indexes => {
-        this.setState({
-            selectedElements: indexes
-        });
-    };
+    handleSelection = indexes => this.setState({ selectedElements: indexes });
 
-    getStyle = index => {
+    getStyle = (i, j) => {
+        const index = i * 3 + j;
         if (this.state.selectedElements.indexOf(index) > -1) {
             // Selected state
-            return {
-                background: '#2185d0',
-                borderColor: '#2185d0',
-                color: 'white'
-            };
+            return { ...styles.item, ...styles.selected };
         }
-        return {};
+        return styles.item;
     };
 
     addElementRef = ref => {
         const elRefs = this.state.elRefs;
         elRefs.push(ref);
-        this.setState({
-            elRefs
-        });
+        this.setState({ elRefs });
     };
 
     renderSelection() {
@@ -47,37 +39,20 @@ export default class Example extends React.PureComponent {
                 target={this.state.ref}
                 elements={this.state.elRefs}
                 onSelectionChange={this.handleSelection}
-                style={this.props.style}
             />
         );
     }
 
     render() {
-        const selectableElements = [
-            'one',
-            'another',
-            'hey there',
-            'item',
-            'two',
-            'three',
-            'something longer?',
-            'last'
-        ];
         return (
-            <div
-                ref={ref => {
-                    this.setState({ ref });
-                }}
-                className="item-container"
-            >
-                {selectableElements.map((el, index) => (
-                    <div
-                        key={el}
-                        ref={this.addElementRef}
-                        style={this.getStyle(index)}
-                        className="item"
-                    >
-                        {el}
+            <div ref={ref => this.setState({ ref })}>
+                {rows.map((r, i) => (
+                    <div key={i} style={styles.row}>
+                        {r.map((c, j) => (
+                            <div key={j} ref={this.addElementRef} style={this.getStyle(i, j)}>
+                                {c}
+                            </div>
+                        ))}
                     </div>
                 ))}
                 {this.renderSelection()}
@@ -85,3 +60,9 @@ export default class Example extends React.PureComponent {
         );
     }
 }
+
+const styles = {
+    row: { display: 'flex' },
+    item: { width: 72, height: 72, background: 'yellow', border: '1px solid black' },
+    selected: { background: 'red' }
+};
